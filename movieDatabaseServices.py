@@ -9,12 +9,12 @@ def imdbService(tweet, api):
         return 'Error: Already interact with this tweet!'
 
     try:
-        title, type, result = dataBase.getFilmTitle(tweet.text)
+        title, type, year, result = dataBase.getFilmTitle(tweet.text)
         if result == 'error':
             api.update_status(status='Sorry, I couldnt understand your request, please do like the example:\n\nvascopuppy:imdb movie="movie_name"\n\nor\n\nvascopuppy:imdb series="series_name"', in_reply_to_status_id=tweet.id, auto_populate_reply_metadata=True)
             return 'Error: Invalid request!'
 
-        id, result = dataBase.getID(titleName=title, type=type)
+        id, result = dataBase.getID(titleName=title, type=type, year=year)
         if result == 'error':
             api.update_status(status='Sorry, ' + type + ' not found!', in_reply_to_status_id=tweet.id, auto_populate_reply_metadata=True)
             return 'Error: Movie/Series not found!'

@@ -11,10 +11,13 @@ class Film:
         self.imdbRating = imdbRating
         self.poster = poster
 
-def getID(titleName, type):
+def getID(titleName, type, year):
     url = "https://movie-database-alternative.p.rapidapi.com/"
     
-    querystring = {"s":titleName,"r":"json","page":"1", "type":type}
+    if year == 'not year':
+        querystring = {"s":titleName,"r":"json","page":"1", "type":type}
+    else:
+        querystring = {"s":titleName,"r":"json","page":"1", "type":type, "y":year}
 
     headers = {
         "X-RapidAPI-Key": twitterBot.rapidapi_key,
@@ -54,9 +57,11 @@ def getFilm(id):
                    )
     return newFilm
 
+# I don't have much mastery of python to make a more elegant function...
 def getFilmTitle(string):
     film_title = ""
     type = ""
+    year = ""
 
     a = string.find('movie="')
     b = string.find('movie="', a+7)
@@ -64,23 +69,38 @@ def getFilmTitle(string):
     c = string.find('series="')
     d = string.find('series="', c+8)
 
-    if a != -1 and b == -1 and c == -1 and d == -1:
+    k = string.find('year="')
+    j = string.find('year="', k+6)
+
+    if a != -1 and b == -1 and c == -1 and d == -1 and j == -1:
         x = a + 7
         type = 'movie'
-    elif a == -1 and b == -1 and c != -1 and d == -1:
+    elif a == -1 and b == -1 and c != -1 and d == -1 and j == -1:
         x = c + 8
         type = 'series'
     else:
-        return any, any, 'error'
+        return any, any, any, 'error'
 
 
     y = string.find('"', x)
     if y == -1:
-        return any, any, 'error'
+        return any, any, any, 'error'
 
     i = x
     while i < y:
         film_title += string[i]
         i += 1
 
-    return film_title, type, 'ok'
+    if k != -1:
+        y = string.find('"', k + 6)
+        if y == -1:
+            return any, any, any, 'error'
+        i = k + 6
+        while i < y:
+            year += string[i]
+            i += 1
+
+        return film_title, type, year, 'ok'
+
+
+    return film_title, type, 'not year', 'ok'
